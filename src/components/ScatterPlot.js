@@ -1,18 +1,17 @@
-import React, { useRef, useEffect, useState} from "react";
+import React, { useRef, useEffect } from "react";
 import colormap from "./utils/colormap";
 import * as d3 from "d3";
 import { Switch } from 'antd';
 
 const ScatterPlot = (props) => {
-  const { margin, width, height, pointSize, data, setSelectCluster, setBrushedIndex, isBrush, setIsBrush, setBrushedData } = props;
-  const { comments } = data;
+  const { margin, width, height, pointSize, data, setSelectCluster, setBrushedIndex, isBrush, setIsBrush, setBrushedData, selectTime } = props;
+  
 
   const svgWidth = margin * 2 + width;
   const svgHeight = margin * 2 + height;
   const splotSvg = useRef(null);
 
   const switchChange = (checked) => {
-    console.log(`switch to ${checked}`);
     setIsBrush(checked);
   };
 
@@ -30,17 +29,24 @@ const ScatterPlot = (props) => {
   }
 
   useEffect(() => {
-    drawSplot(comments);
+    const { comments } = data;
+    const startDate = new Date(selectTime[0]);
+    const endDate = new Date(selectTime[1]);
+    const filteredCom = comments.filter(d =>{
+      const date = new Date(d.created_date.split(' ')[0]);
+      return date >= startDate && date < endDate;
+    })
+    drawSplot(filteredCom);
     if(!isBrush){
       setBrushedData(undefined);
     }
-  }, [isBrush])
+  }, [isBrush, selectTime])
 
 
   const drawSplot = (comments) =>{
     // set extent
-    const xExtent = d3.extent(comments.map(d => parseFloat(d.x)));
-    const yExtent = d3.extent(comments.map(d => parseFloat(d.y)));
+    const xExtent = d3.extent(data.comments.map(d => parseFloat(d.x)));
+    const yExtent = d3.extent(data.comments.map(d => parseFloat(d.y)));
     // set scale
     const xScale  = d3.scaleLinear().domain(xExtent).range([0, width]);
     const yScale  = d3.scaleLinear().domain(yExtent).range([height, 0]);
@@ -109,8 +115,6 @@ const ScatterPlot = (props) => {
           }
 
           function dragStart(event) {
-            console.log(event);
-              console.log('start');
               coords = [];
               // circles.attr("fill", "steelblue");
               d3.select("#lasso").remove();
@@ -136,7 +140,6 @@ const ScatterPlot = (props) => {
           }
 
           function dragEnd() {
-            console.log('end');
               let selectedDots = [];
               circles.each((d, i) => {
                   let point = [

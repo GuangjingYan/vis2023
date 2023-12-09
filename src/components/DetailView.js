@@ -17,20 +17,19 @@ const DetailView = (props) => {
   }, [props])
 
   const renderDetailView = (data) => {
-    const {abstract} = data; // topK
+    const {abstract, topk} = data; // topK
     const abstractItem = [{
       label: '',
       children: abstract
     }];
-    // const topKItem = topK.map(d => {
-    //   return {
-    //     label: '',
-    //     children: d.body
-    //   }
-    // });
-    // const curItems = [...abstractItem, ...topKItem];
-    // return curItems;
-    return abstractItem
+    const topKItem = topk.map(d => {
+      return {
+        label: '',
+        children: d.body
+      }
+    });
+    const curItems = [...abstractItem, ...topKItem];
+    return curItems;
   }
 
 

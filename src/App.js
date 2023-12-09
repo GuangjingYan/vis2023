@@ -20,6 +20,7 @@ function App() {
   const [brushedData, setBrushedData] = useState();
   const [clusterNum, setClusterNum] = useState(3);
   const [trendData, setTrendData] = useState();
+  const [selectTime, setSelectTime] = useState([]);
   const margin = {
     top: 10,
     right: 15,
@@ -27,53 +28,67 @@ function App() {
     left: 15
   };
 
-
-useEffect(()=>{
-  if(!(submissionId === undefined)){
-    // request cluster data
-    ApiService.GetAllClusterData(submissionId)
-    .then(data => {
-      const { clusters } = data;
-      setClusterData(clusters)
-      
-    })
-    .catch(error => {
-        console.error('Error fetching clusters:', error);
-    });
-    // request comment data
-    ApiService.GetAllCommentsData(submissionId)
+  // request data
+  useEffect(()=>{
+    if(!(submissionId === undefined)){
+      // request cluster data
+      ApiService.GetAllClusterData(submissionId)
       .then(data => {
-        setAllComData(data);
-        console.log(data);
+        const { clusters } = data;
+        setClusterData(clusters)
+        
       })
       .catch(error => {
-          console.error('Error fetching comments:', error);
+          console.error('Error fetching clusters:', error);
       });
-    // request trend data
-    ApiService.GetTrendData(submissionId, 'day')
+      // request comment data
+      ApiService.GetAllCommentsData(submissionId)
+        .then(data => {
+          setAllComData(data);
+          console.log(data);
+        })
+        .catch(error => {
+            console.error('Error fetching comments:', error);
+        });
+      // request trend data
+      ApiService.GetTrendData(submissionId, 'day')
+        .then(data => {
+          setTrendData(data);
+          console.log(data);
+        })
+        .catch(error => {
+            console.error('Error fetching comments:', error);
+        });
+    }
+  },[submissionId, clusterNum])
+
+  useEffect(() => {
+    if(!(submissionId === undefined)){
+      ApiService.SendBrushedData(submissionId, 3, brushedIndex)
       .then(data => {
-        setTrendData(data);
         console.log(data);
+        setBrushedData(data);
       })
       .catch(error => {
-          console.error('Error fetching comments:', error);
+          console.error('Error fetching brushed items:', error);
       });
-  }
-},[submissionId, clusterNum])
+    }
+  }, [brushedIndex, submissionId])
 
-useEffect(() => {
-  console.log(brushedIndex, submissionId);
-  if(!(submissionId === undefined)){
-    ApiService.SendBrushedData(submissionId, 3, brushedIndex)
-    .then(data => {
-      console.log(data);
-      setBrushedData(data);
-    })
-    .catch(error => {
-        console.error('Error fetching brushed items:', error);
-    });
-  }
-}, [brushedIndex])
+  // filter comment
+  // useEffect(() => {
+  //   if(allComData !== undefined){
+  //     const startDate = new Date(selectTime[0]);
+  //     const endDate = new Date(selectTime[1]);
+  //     console.log(startDate, endDate);
+  //     const filteredCom = allComData.comments.filter(d =>{
+  //       const date = new Date(d.created_date.split(' ')[0]);
+  //       return date >= startDate && date < endDate;
+  //     })
+  //     console.log(filteredCom);
+  //   }
+
+  // },[selectTime, allComData])
 
   return (
     <div className="App">
@@ -97,6 +112,7 @@ useEffect(() => {
           isBrush = {isBrush}
           setIsBrush = {setIsBrush}
           setBrushedData = {setBrushedData}
+          selectTime = {selectTime}
           />}
         </div>
         <div>
@@ -106,6 +122,7 @@ useEffect(() => {
           height = {100}
           margin = {35}
           trendData = {trendData}
+          setSelectTime = {setSelectTime}
           />}
         </div>
       </div>

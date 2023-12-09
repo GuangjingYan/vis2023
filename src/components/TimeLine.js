@@ -3,26 +3,35 @@ import * as d3 from "d3";
 import colormap from "./utils/colormap";
 
 const TimeLine = (props) => {
-  const { width, height, margin, trendData } = props;
+  const { width, height, margin, trendData, setSelectTime } = props;
   const { all_data, clusters } = trendData;
+  let timeSeries = all_data.map(d => d.end.split(' ')[0]);
+  timeSeries.unshift(all_data[0].start.split(' ')[0]);
   const tLSvg = useRef(null);
 
   const xScale = d3.scaleLinear()
-  .domain([0, all_data.length]) // 
+  .domain([0, timeSeries.length]) // 
   .range([ 0, width ]);
 
-  let brush = d3.brush()
+  let brush = d3.brushX()
   .extent([[0, 0], [width, height]])
-  .on("start brush end", brushed);
+  .on("start brush end", brushed)
+  
 
   function brushed(event) {
     const selection = event.selection;
+
     if (selection === null) {
       // circle.attr("stroke", null);
       console.log('selection null');
     } else {
       const [x0, x1] = selection.map(xScale.invert);
-      // circle.attr("stroke", d => x0 <= d && d <= x1 ? "red" : null);
+      const approX0 = Math.floor(x0);
+      const approX1 = Math.ceil(x1);
+      setSelectTime([timeSeries[approX0],timeSeries[approX1]]);
+
+      // d3.select('#brushSvg')
+      // .call(brush.move, [xScale(approX0), xScale(approX1)]);
     }
   }
 
@@ -45,12 +54,7 @@ const TimeLine = (props) => {
     const xAxis = d3.axisBottom()
       .scale(xScale)
       .tickFormat((d, i) => {
-        const end = all_data.map(d => {
-          let time = d.end;
-          time = time.split(' ')[0];
-          return time
-          });
-        return end[d]
+        return timeSeries[d]
       })
 
     g.append('g')
@@ -85,30 +89,34 @@ const TimeLine = (props) => {
 
     // add brsuh 
     // const x = d3.scaleLinear([0, 10], [margin.left, width - margin.right]);
+    const arc = d3.arc()
+    .innerRadius(0)
+    .outerRadius((height - margin.top - margin.bottom) / 2)
+    .startAngle(0)
+    .endAngle((d, i) => i ? Math.PI : -Math.PI)
+
       g.append("g")
       .attr('class', 'brushSvg')
       .attr('transform', `translate(0, 0)`)
       .call(brush)
-      // .call(brush.move, [10, 50])
-      // .call(g => g.select(".overlay")
-      //     .datum({type: "selection"})
-      //     .on("mousedown", beforebrushstarted));
+      .call(brush.move, [0, width])
+      .call(g => g.select(".overlay")
+          .datum({type: "selection"})
+          .on("mousedown", beforebrushstarted));
+
+    setSelectTime([timeSeries[0], timeSeries[timeSeries.length - 1]]);
+
 
     function beforebrushstarted(event) {
       console.log('before');
-      const dx = xScale(1) - xScale(0); // Use a fixed width when recentering.
       const [[cx]] = d3.pointers(event);
-      const [x0, x1] = [cx - dx / 2, cx + dx / 2];
-      const [X0, X1] = xScale.range();
+      const x0 = Math.floor(xScale.invert(cx));
+      const x1 = Math.ceil(xScale.invert(cx));
+      console.log(`x0:${x0}  x1:${x1}`);
       d3.select(this.parentNode)
-          .call(brush.move, x1 > X1 ? [X1 - dx, X1] 
-              : x0 < X0 ? [X0, X0 + dx] 
-              : [x0, x1]);
+      .call(brush.move, [xScale(x0), xScale(x1)])
     }
 
-    
-
-    
 
   }
   
