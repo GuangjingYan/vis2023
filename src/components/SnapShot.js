@@ -39,9 +39,11 @@ const SnapShot = (props) => {
 
     const xExtent = d3.extent(snapshotData.map(d => parseFloat(d.x)));
     const yExtent = d3.extent(snapshotData.map(d => parseFloat(d.y)));
+    const sizeExtent = d3.extent(data.comments.map(d => parseInt(d.score)));
     
     const xScale = d3.scaleLinear().domain(xExtent).range([0, ( width) / 2]);
     const yScale = d3.scaleLinear().domain(yExtent).range([(height) / 2, 0]);
+    const sizeScale = d3.scaleLinear().domain(sizeExtent).range([3, 7]);
 
 		const circleSvg = svg.append("g").attr("transform", `translate(${ margin/2 }, ${ margin/2 })`).attr("class", "snapShotCircleSvg")
 		const circles = circleSvg.selectAll("circle")
@@ -52,7 +54,7 @@ const SnapShot = (props) => {
 						 .attr("cy", d => yScale(parseFloat(d.y)))
 						 .attr("class", (d, _) => "cluster" + d.cluster)
              .attr("id", (d, _) => d.id)
-						 .attr("r", pointSize)
+						 .attr("r", d => sizeScale(parseInt(d.score)))
              .attr("fill", (d, _) => colormap(d.cluster))
      
   }

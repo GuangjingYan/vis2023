@@ -47,9 +47,11 @@ const ScatterPlot = (props) => {
     // set extent
     const xExtent = d3.extent(data.comments.map(d => parseFloat(d.x)));
     const yExtent = d3.extent(data.comments.map(d => parseFloat(d.y)));
+    const sizeExtent = d3.extent(data.comments.map(d => parseInt(d.score)));
     // set scale
     const xScale  = d3.scaleLinear().domain(xExtent).range([0, width]);
     const yScale  = d3.scaleLinear().domain(yExtent).range([height, 0]);
+    const sizeScale = d3.scaleLinear().domain(sizeExtent).range([3, 7]);
     // scatterplot area
     const svg = d3.select(splotSvg.current).attr("class", "Splot");
     splotSvg.current.querySelectorAll('*').forEach(n => n.remove());
@@ -63,7 +65,7 @@ const ScatterPlot = (props) => {
 						 .attr("cy", d => yScale(parseFloat(d.y)))
 						 .attr("class", (d, _) => "cluster" + d.cluster)
              .attr("id", (d, _) => d.id)
-						 .attr("r", pointSize)
+						 .attr("r", d => sizeScale(parseInt(d.score)))
              .attr("fill", (d, _) => colormap(d.cluster))
              .on("mouseover", pointMouseOverHandler)
              .on('mouseout', pointMouseOutHandler)
