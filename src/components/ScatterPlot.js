@@ -19,13 +19,30 @@ const ScatterPlot = (props) => {
     const clusterIdx = parseInt(e.target.className.baseVal[7]);
     setSelectCluster(clusterIdx);
     d3.select(e.target).transition().attr("fill", "#A8234E").attr("r", 10);
-  }
+
+      // Add tooltip text
+      d3.select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("position", "absolute")
+        .style("pointer-events", "none")
+        .style("background-color", "white")
+        .style("border", "1px solid black")
+        .style("padding", "5px")
+        .style("font-size", "12px")
+        .style("left", e.pageX + "px")
+        .style("top", (e.pageY - 20) + "px") // Adjust the top position to be above the target element
+        .style("white-space", "pre-wrap") // Preserve line breaks
+        .text(data.comments.find((d) => d.id === e.target.id).body);
+    };
 
   const pointMouseOutHandler = (e) => {
     d3.select(e.target)
     .transition()
     .attr("fill", (d) => colormap(d.cluster))
     .attr("r", pointSize);
+    // Remove tooltip text
+    d3.select(".tooltip").remove();
   }
 
   useEffect(() => {
@@ -67,7 +84,7 @@ const ScatterPlot = (props) => {
              .attr("id", (d, _) => d.id)
 						 .attr("r", d => sizeScale(parseInt(d.score)))
              .attr("fill", (d, _) => colormap(d.cluster))
-             .on("mouseover", pointMouseOverHandler)
+             .on("mouseover",pointMouseOverHandler)
              .on('mouseout', pointMouseOutHandler)
              
     if(isBrush){
