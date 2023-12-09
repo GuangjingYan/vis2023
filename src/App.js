@@ -110,6 +110,7 @@ function App() {
             height={350}
             pointSize={5}            
             data={allComData}
+            selectTime={selectTime}
           />}
         </div>        
         <div className='ScatterPlot'>

@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import './SnapShot.css'
 
 const SnapShot = (props) => {
-  const { margin, width, height, pointSize, data } = props;
+  const { margin, width, height, pointSize, data, selectTime } = props;
   const { comments } = data;
   const [snapShots, setSnapShots] = useState([null, null]); // Two slots for snapshots
   const snapShotSvgRefs = useRef([createRef(), createRef()]);
@@ -12,7 +12,15 @@ const SnapShot = (props) => {
   const addSnapShot = (index) => {
     if (snapShots[index] === null) {
       const updatedSnapshots = [...snapShots];
-      updatedSnapshots[index] = comments; // replace null with actual data
+
+      const startDate = new Date(selectTime[0]);
+      const endDate = new Date(selectTime[1]);
+      const filteredCommments = comments.filter(d =>{
+        const date = new Date(d.created_date.split(' ')[0]);
+        return date >= startDate && date < endDate;
+      })      
+
+      updatedSnapshots[index] = filteredCommments; // replace null with actual data
       setSnapShots(updatedSnapshots);
     }
   };
