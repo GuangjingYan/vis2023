@@ -39,7 +39,7 @@ function App() {
       .then(data => {
         const { clusters } = data;
         setClusterData(clusters)
-        
+        console.log(submissionId);
       })
       .catch(error => {
           console.error('Error fetching clusters:', error);
@@ -47,6 +47,7 @@ function App() {
       // request comment data
       ApiService.GetAllCommentsData(submissionId)
         .then(data => {
+          console.log(submissionId);
           setAllComData(data);
           console.log(data);
         })
@@ -57,7 +58,7 @@ function App() {
       ApiService.GetTrendData(submissionId, 'day')
         .then(data => {
           setTrendData(data);
-          console.log(data);
+          console.log(data); 
         })
         .catch(error => {
             console.error('Error fetching comments:', error);

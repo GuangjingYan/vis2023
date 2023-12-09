@@ -18,7 +18,7 @@ const ControlView = (props) => {
   useEffect(()=>{
     const desItem = renderControlView(clusters);
     setItems(desItem);
-  }, [])
+  }, [clusters])
 
   // render detail view
   const renderControlView = (data) => {

@@ -4,42 +4,42 @@ import colormap from "./utils/colormap";
 
 const TimeLine = (props) => {
   const { width, height, margin, trendData, setSelectTime } = props;
-  const { all_data, clusters } = trendData;
-  let timeSeries = all_data.map(d => d.end.split(' ')[0]);
-  timeSeries.unshift(all_data[0].start.split(' ')[0]);
   const tLSvg = useRef(null);
 
-  const xScale = d3.scaleLinear()
-  .domain([0, timeSeries.length]) // 
-  .range([ 0, width ]);
-
-  let brush = d3.brushX()
-  .extent([[0, 0], [width, height]])
-  .on("start brush end", brushed)
-  
-
-  function brushed(event) {
-    const selection = event.selection;
-
-    if (selection === null) {
-      // circle.attr("stroke", null);
-      console.log('selection null');
-    } else {
-      const [x0, x1] = selection.map(xScale.invert);
-      const approX0 = Math.floor(x0);
-      const approX1 = Math.ceil(x1);
-      setSelectTime([timeSeries[approX0],timeSeries[approX1]]);
-
-      // d3.select('#brushSvg')
-      // .call(brush.move, [xScale(approX0), xScale(approX1)]);
-    }
-  }
-
   useEffect(() => {
-    drawTimeLine();
-  },[])
+    drawTimeLine(trendData);
+    console.log(trendData);
+  },[trendData])
 
-  const drawTimeLine = () => {
+  const drawTimeLine = (trendData) => {
+    const { all_data } = trendData;
+    let timeSeries = all_data.map(d => d.end.split(' ')[0]);
+    timeSeries.unshift(all_data[0].start.split(' ')[0]);
+    
+    const xScale = d3.scaleLinear()
+    .domain([0, timeSeries.length]) // 
+    .range([ 0, width ]);
+
+    const brush = d3.brushX()
+    .extent([[0, 0], [width, height]])
+    .on("start brush end", brushed)
+    
+    function brushed(event) {
+      const selection = event.selection;
+
+      if (selection === null) {
+        // circle.attr("stroke", null);
+        console.log('selection null');
+      } else {
+        const [x0, x1] = selection.map(xScale.invert);
+        const approX0 = Math.floor(x0);
+        const approX1 = Math.ceil(x1);
+        setSelectTime([timeSeries[approX0],timeSeries[approX1]]);
+
+        // d3.select('#brushSvg')
+        // .call(brush.move, [xScale(approX0), xScale(approX1)]);
+      }
+    }
     const svg = d3.select(tLSvg.current).attr("class", "tLSvg");
     tLSvg.current.querySelectorAll('*').forEach(n => n.remove());
     const g = svg.append('g')
