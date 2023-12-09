@@ -1,0 +1,60 @@
+.snapshot-wrapper {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+}
+
+.snapshot-slot {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.snapShotSvg {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.snapshot-add-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px dashed #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.5;
+}
+
+.snapshot-add-button:hover {
+  background-color: #e0e0e0; 
+  opacity: 1;
+}
+
+.snapshot-remove-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px dashed #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.snapshot-remove-button:hover {
+  background-color: #e0e0e0; 
+  opacity: 1;
+}

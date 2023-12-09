@@ -9,6 +9,7 @@ import DetailView from './components/DetailView';
 import SubmissionQuery from './components/SubmissionQuery';
 import ClusterSlider from './components/ClusterSlider';
 import TimeLine from './components/TimeLine';
+import SnapShot from './components/SnapShot';
 
 function App() {
   const [allComData, setAllComData] = useState();
@@ -21,6 +22,8 @@ function App() {
   const [clusterNum, setClusterNum] = useState(3);
   const [trendData, setTrendData] = useState();
   const [selectTime, setSelectTime] = useState([]);
+  const [snapshots, setSnapshots] = useState([]);
+  
   const margin = {
     top: 10,
     right: 15,
@@ -99,6 +102,16 @@ function App() {
           setSubmissionId = {setSubmissionId}
           />
         </div>
+        <div className="Snapshot">
+          {allComData &&
+            <SnapShot 
+            margin={35}
+            width={500}
+            height={350}
+            pointSize={5}            
+            data={allComData}
+          />}
+        </div>        
         <div className='ScatterPlot'>
           {allComData && 
           <ScatterPlot
