@@ -11,7 +11,10 @@ const ClusterSlider = (props) => {
 
   return (
     <Row>
-      <Col span={12}>
+      <Col span={4}>
+        <p># of clusters</p>
+      </Col>
+      <Col span={8}>
         <Slider
           min={1}
           max={8}

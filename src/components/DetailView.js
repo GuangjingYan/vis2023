@@ -3,7 +3,7 @@ import { Descriptions, Card, ConfigProvider } from 'antd';
 import * as d3 from "d3";
 
 const DetailView = (props) => {
-  const {clusters, idx, isBrush, brushedData, detailLoading, setDetailLoading} = props;
+  const {clusters, idx, isBrush, brushedData, detailLoading, setDetailLoading, height} = props;
   const [abstractItems, setAbstractItems] = useState({});
   const [topkItems, setTopkItems] = useState([]);
   // const [loading, setLoading] = useState(false);
@@ -22,11 +22,19 @@ const DetailView = (props) => {
   }, [isBrush, brushedData, clusters, idx])
 
   const topkOnHover = (e) => {
-    d3.select('.Splot').select(`#${e.target.id}`).attr('stroke', 'black');
+    try{
+      d3.select('.Splot').select(`#${e.target.id}`).attr('stroke', 'black');
+    }catch(e){
+      console.log('this comment is not in the scatter plot');
+    }
   }
 
   const topkOnLeave = (e) => {
+    try{
     d3.select('.Splot').select(`#${e.target.id}`).attr('stroke', 'none');
+  }catch(e){
+    console.log('this comment is not in the scatter plot');
+  }
   }
 
   const renderDetailView = (data) => {
@@ -68,7 +76,7 @@ const DetailView = (props) => {
       <Card
           style={{
               width: 400,
-              height: 200,
+              height: height * 0.4,
               marginTop: 16,
           }}
           title = 'Abstract'
@@ -77,7 +85,7 @@ const DetailView = (props) => {
         >
           <div style={{
           width: 400,
-          height:160,
+          height:height * 0.4 - 40,
           overflow: 'scroll'}}>
             <p>{abstractItems.children}</p>
           </div>
@@ -85,7 +93,7 @@ const DetailView = (props) => {
       <Card
           style={{
             width: 400,
-            height:300,
+            height:height * 0.6,
             marginTop: 16,
           }}
           title = 'Similar views'
@@ -94,7 +102,7 @@ const DetailView = (props) => {
       >
         <div style={{
           width: 400,
-          height:260,
+          height:height * 0.6 - 40,
           overflow: 'scroll'}}>
             {
               topkItems.map(d => {

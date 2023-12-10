@@ -5,7 +5,7 @@ import './ControlView.css'
 import { Descriptions } from 'antd';
 
 const ControlView = (props) => {
-  const { clusters, setSelectCluster } = props
+  const { clusters, setSelectCluster, height } = props
   const [items, setItems] = useState()
 
   const onClickHandler = (e) => {
@@ -34,8 +34,10 @@ const ControlView = (props) => {
   }
 
   return (
+    <div style={{height: height}}>
     <Descriptions title="Control View" column={2} items={items}>
     </Descriptions>
+    </div>
    )
 }
 

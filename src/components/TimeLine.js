@@ -5,6 +5,7 @@ import colormap from "./utils/colormap";
 const TimeLine = (props) => {
   const { width, height, margin, trendData, setSelectTime } = props;
   const tLSvg = useRef(null);
+  const sentimentColormap = ["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854","#ffd92f","#e5c494","#b3b3b3"]
 
   useEffect(() => {
     drawTimeLine(trendData);
@@ -12,12 +13,20 @@ const TimeLine = (props) => {
   },[trendData])
 
   const drawTimeLine = (trendData) => {
-    const { all_data } = trendData;
+    let { all_data } = trendData;
     let timeSeries = all_data.map(d => d.end.split(' ')[0]);
     timeSeries.unshift(all_data[0].start.split(' ')[0]);
+    const new_all_data = [...all_data];
+    new_all_data.unshift({
+      start: timeSeries[0],
+      end: timeSeries[0],
+      positive_ratio: 0,
+      negative_ratio: 0,
+      neutral_ratio: 0
+  })
     
     const xScale = d3.scaleLinear()
-    .domain([0, timeSeries.length]) // 
+    .domain([0, timeSeries.length - 1]) // 
     .range([ 0, width ]);
 
     const brush = d3.brushX()
@@ -35,9 +44,6 @@ const TimeLine = (props) => {
         const approX0 = Math.floor(x0);
         const approX1 = Math.ceil(x1);
         setSelectTime([timeSeries[approX0],timeSeries[approX1]]);
-
-        // d3.select('#brushSvg')
-        // .call(brush.move, [xScale(approX0), xScale(approX1)]);
       }
     }
     const svg = d3.select(tLSvg.current).attr("class", "tLSvg");
@@ -53,7 +59,7 @@ const TimeLine = (props) => {
 
     const xAxis = d3.axisBottom()
       .scale(xScale)
-      .tickFormat((d, i) => {
+      .tickFormat((d) => {
         return timeSeries[d]
       })
 
@@ -69,9 +75,7 @@ const TimeLine = (props) => {
 
     var stackedData = d3.stack()
     .keys(['positive_ratio', 'negative_ratio', 'neutral_ratio'])
-    (all_data)
-
-    console.log(stackedData);
+    (new_all_data);
 
     var areaGen = d3.area()
     .x((_, i) => {
@@ -85,15 +89,9 @@ const TimeLine = (props) => {
     .data(stackedData)
     .join("path")
     .attr("d", areaGen)
-    .attr("fill", (_, i)=>colormap(i));
+    .attr("fill", (_, i)=>sentimentColormap[i]);
 
     // add brsuh 
-    // const x = d3.scaleLinear([0, 10], [margin.left, width - margin.right]);
-    const arc = d3.arc()
-    .innerRadius(0)
-    .outerRadius((height - margin.top - margin.bottom) / 2)
-    .startAngle(0)
-    .endAngle((d, i) => i ? Math.PI : -Math.PI)
 
       g.append("g")
       .attr('class', 'brushSvg')

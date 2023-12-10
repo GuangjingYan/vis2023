@@ -61,3 +61,16 @@
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
+.VerticalLeft{
+  width: 60%;
+  padding: 20px;
+}
+.VerticalRight{
+  width: 30%;
+  padding: 20px;
+}
+
+.ControlView{
+  width: 400px;
+}

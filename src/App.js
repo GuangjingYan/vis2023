@@ -32,6 +32,9 @@ function App() {
     left: 15
   };
 
+  const screenWidth = window.innerWidth;
+  const scrennHeight = window.innerHeight;
+
   // request data
   useEffect(()=>{
     if(!(submissionId === undefined)){
@@ -100,7 +103,7 @@ function App() {
 
   return (
     <div className="App">
-      <div className='Vertical'>
+      <div className='VerticalLeft'>
         <div className='SubmissionQuery'>
           <SubmissionQuery
           margin = {margin}
@@ -111,8 +114,8 @@ function App() {
           {allComData &&
             <SnapShot 
             margin={35}
-            width={500}
-            height={350}
+            width={screenWidth * 0.4}
+            height={scrennHeight * 0.3}
             pointSize={5}            
             data={allComData}
             selectTime={selectTime}
@@ -122,8 +125,8 @@ function App() {
           {allComData && 
           <ScatterPlot
           margin= {35}
-          width = {500}
-          height = {350}
+          width = {screenWidth * 0.4}
+          height = {scrennHeight * 0.3}
           pointSize = {5}
           data = {allComData}
           setSelectCluster = {setSelectCluster}
@@ -138,20 +141,21 @@ function App() {
         <div>
           {trendData &&
           <TimeLine
-          width = {700}
-          height = {100}
+          width = {screenWidth * 0.6}
+          height = {scrennHeight * 0.1}
           margin = {35}
           trendData = {trendData}
           setSelectTime = {setSelectTime}
           />}
         </div>
       </div>
-      <div className='Panel'>
+      <div className='VerticalRight'>
         <div className='ControlView'>
           {clusterData && 
           <ControlView
           clusters = {clusterData}
           setSelectCluster = {setSelectCluster}
+          height = {scrennHeight * 0.2 }
           />}
         </div>
         <div>
@@ -168,6 +172,7 @@ function App() {
           brushedData = {brushedData}
           detailLoading = {detailLoading}
           setDetailLoading = {setDetailLoading}
+          height = {scrennHeight * 0.6}
           />
         </div>
       </div>
