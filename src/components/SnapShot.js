@@ -6,15 +6,13 @@ import './SnapShot.css'
 const RATIO = 0.6; // ratio of snapshot size to scatterplot size
 
 const SnapShot = (props) => {
-  const { margin, width, height, pointSize, data, selectTime } = props;
+  const { margin, width, height, pointSize, data, selectTime, isCompareMode, setIsCompareMode, setCompareIndexes ,setComparedData, setDetailLoading} = props;
   const { comments } = data;
   const adjustedWidth = width * RATIO;
   const adjustedHeight = height * RATIO;
   const adjustedMargin = margin * RATIO;
   const [snapShots, setSnapShots] = useState([null, null]); // Two slots for snapshots
   const snapShotSvgRefs = useRef([createRef(), createRef()]);
-  const [compareIndexes, setCompareIndexes] = useState([]);
-  const [isCompareMode, setIsCompareMode] = useState(false);
 
   const addSnapShot = (index) => {
     if (snapShots[index] === null) {
@@ -36,6 +34,8 @@ const SnapShot = (props) => {
     const updatedSnapshots = [...snapShots];
     updatedSnapshots[index] = null; // set the slot back to null
     setSnapShots(updatedSnapshots);
+    setIsCompareMode(false);
+
   };
 
   const drawSnapShot = (snapshotData, ref) => {
@@ -68,26 +68,35 @@ const SnapShot = (props) => {
 
   const handleCompare = () => {
     // Assuming you have two snapshots for comparison
-    
+    if (snapShots[0] && snapShots[1] && isCompareMode === false) {
+      const firstSnapshotIds = new Set(snapShots[0].map(comment => comment.id));
+      const secondSnapshotIds = new Set(snapShots[1].map(comment => comment.id));
 
-    if (snapShots[0] && snapShots[1] && !isCompareMode) {
-
-      // Extract the comment indexes from each snapshot
-      const indexesFirstSnapshot = snapShots[0].map(comment => comment.id);
-      const indexesSecondSnapshot = snapShots[1].map(comment => comment.id);
-      console.log(indexesFirstSnapshot, indexesSecondSnapshot)
-      // Find the differences in comments
-      const differences = indexesSecondSnapshot.filter(id => !indexesFirstSnapshot.includes(id));
-
+      const differencesSecondNotInFirst = Array.from(secondSnapshotIds).filter(id => !firstSnapshotIds.has(id));
+      const differencesFirstNotInSecond = Array.from(firstSnapshotIds).filter(id => !secondSnapshotIds.has(id));
+      const combinedDifferences = Array.from(new Set([...differencesSecondNotInFirst, ...differencesFirstNotInSecond]));
       
       // Update state or call an API with these differences
-      if (differences.length !== 0) {
-        console.log("differences: " + differences)
-        setCompareIndexes(differences);
+      if (combinedDifferences.length !== 0) {
+        setDetailLoading(true);
+        console.log("differences: " + combinedDifferences)
+        // setCompareIndexes(differences);
+        setIsCompareMode(true);
+        setCompareIndexes(combinedDifferences);
+        return;
+      }
+      else {
+        setDetailLoading(false);
+        console.log("no differences");
+        return;
       }
       // Here you would call your API with the differences
       // ApiService.sendCompareData(differences).then(...) // Example API call
     }
+    if (isCompareMode === true) {
+      setComparedData(undefined);
+    }
+    console.log(isCompareMode)
     setIsCompareMode(!isCompareMode);
     console.log(isCompareMode)
   };

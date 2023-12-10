@@ -3,23 +3,33 @@ import { Descriptions, Card, ConfigProvider } from 'antd';
 import * as d3 from "d3";
 
 const DetailView = (props) => {
-  const {clusters, idx, isBrush, brushedData, detailLoading, setDetailLoading, height} = props;
+  const {clusters, idx, isBrush, brushedData, detailLoading, setDetailLoading, height, isCompareMode, comparedData} = props;
   const [abstractItems, setAbstractItems] = useState({});
   const [topkItems, setTopkItems] = useState([]);
   // const [loading, setLoading] = useState(false);
   
+
   useEffect(() => {
-    if(isBrush && brushedData !== undefined){
+    if(isBrush && brushedData !== undefined) {
       setDetailLoading(false);
       const { brush } = brushedData;
       renderDetailView(brush);
-    }else{
+    }
+    else {
       if(clusters !== undefined){
       setDetailLoading(false);
       const cluster = clusters[idx];
       renderDetailView(cluster);
     }} 
   }, [isBrush, brushedData, clusters, idx])
+
+  useEffect(() => {
+    if (isCompareMode && comparedData !== undefined) {
+      setDetailLoading(false);
+      const {brush} = comparedData;
+      renderDetailView(brush);
+    }
+  }, [comparedData])
 
   const topkOnHover = (e) => {
     try{

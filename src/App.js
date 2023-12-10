@@ -24,7 +24,10 @@ function App() {
   const [selectTime, setSelectTime] = useState([]);
   const [snapshots, setSnapshots] = useState([]);
   const [detailLoading, setDetailLoading] = useState(true);
-  
+  const [compareIndexes, setCompareIndexes] = useState([]);
+  const [isCompareMode, setIsCompareMode] = useState(false);
+  const [comparedData, setComparedData] = useState();
+
   const margin = {
     top: 10,
     right: 15,
@@ -74,10 +77,10 @@ function App() {
   },[submissionId, clusterNum])
 
   useEffect(() => {
-    if(!(submissionId === undefined)){
-      ApiService.SendBrushedData(submissionId, 3, brushedIndex)
+    if((submissionId !== undefined && brushedIndex !== undefined)){
+      ApiService.SendBrushedData(submissionId, 5, brushedIndex)
       .then(data => {
-        console.log(data);
+        console.log('brushedData -- ' + data);
         setBrushedData(data);
       })
       .catch(error => {
@@ -86,6 +89,19 @@ function App() {
     }
   }, [brushedIndex, submissionId])
 
+
+  useEffect(() => { 
+    if((submissionId !== undefined) && (compareIndexes !== undefined)){  
+      ApiService.SendBrushedData(submissionId, 5, compareIndexes)
+      .then(data => {
+        console.log('comparedData -- ' + data);
+        setComparedData(data);
+      })
+      .catch(error => {
+          console.error('Error fetching compared items:', error);
+      });
+    }
+  }, [compareIndexes, submissionId])
   // filter comment
   // useEffect(() => {
   //   if(allComData !== undefined){
@@ -119,6 +135,11 @@ function App() {
             pointSize={5}            
             data={allComData}
             selectTime={selectTime}
+            isCompareMode={isCompareMode}
+            setIsCompareMode={setIsCompareMode}
+            setCompareIndexes={setCompareIndexes}
+            setComparedData = {setComparedData}
+            setDetailLoading = {setDetailLoading}
           />}
         </div>        
         <div className='ScatterPlot'>
@@ -173,6 +194,8 @@ function App() {
           detailLoading = {detailLoading}
           setDetailLoading = {setDetailLoading}
           height = {scrennHeight * 0.6}
+          isCompareMode={isCompareMode}
+          comparedData={comparedData}
           />
         </div>
       </div>
