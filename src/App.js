@@ -15,7 +15,7 @@ function App() {
   const [allComData, setAllComData] = useState();
   const [clusterData, setClusterData] = useState();
   const [selectCluster, setSelectCluster] = useState(0);
-  const [submissionId, setSubmissionId] = useState('172zzu2');
+  const [submissionId, setSubmissionId] = useState('fc1210i');
   const [brushedIndex, setBrushedIndex] = useState([]);
   const [isBrush, setIsBrush] = useState(false);
   const [brushedData, setBrushedData] = useState();
@@ -23,6 +23,7 @@ function App() {
   const [trendData, setTrendData] = useState();
   const [selectTime, setSelectTime] = useState([]);
   const [snapshots, setSnapshots] = useState([]);
+  const [detailLoading, setDetailLoading] = useState(true);
   
   const margin = {
     top: 10,
@@ -35,15 +36,18 @@ function App() {
   useEffect(()=>{
     if(!(submissionId === undefined)){
       // request cluster data
+
       ApiService.GetAllClusterData(submissionId)
       .then(data => {
+        setClusterData(undefined);
+        setDetailLoading(true);
         const { clusters } = data;
         setClusterData(clusters)
-        console.log(submissionId);
       })
       .catch(error => {
           console.error('Error fetching clusters:', error);
       });
+      
       // request comment data
       ApiService.GetAllCommentsData(submissionId)
         .then(data => {
@@ -128,6 +132,7 @@ function App() {
           setIsBrush = {setIsBrush}
           setBrushedData = {setBrushedData}
           selectTime = {selectTime}
+          setDetailLoading = {setDetailLoading}
           />}
         </div>
         <div>
@@ -156,14 +161,14 @@ function App() {
           />
         </div>
         <div className='DetailView'>
-          {clusterData &&
           <DetailView
           clusters = {clusterData}
           idx = {selectCluster}
           isBrush = {isBrush}
           brushedData = {brushedData}
+          detailLoading = {detailLoading}
+          setDetailLoading = {setDetailLoading}
           />
-          }
         </div>
       </div>
       {/* <div>

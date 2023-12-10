@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { Switch } from 'antd';
 
 const ScatterPlot = (props) => {
-  const { margin, width, height, pointSize, data, setSelectCluster, setBrushedIndex, isBrush, setIsBrush, setBrushedData, selectTime } = props;
+  const { margin, width, height, pointSize, data, setSelectCluster, setBrushedIndex, isBrush, setIsBrush, setBrushedData, selectTime, setDetailLoading } = props;
   
 
   const svgWidth = margin * 2 + width;
@@ -134,6 +134,7 @@ const ScatterPlot = (props) => {
           }
 
           function dragStart(event) {
+            setDetailLoading(true);
               coords = [];
               // circles.attr("fill", "steelblue");
               d3.select("#lasso").remove();
