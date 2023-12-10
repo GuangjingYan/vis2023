@@ -3,11 +3,18 @@ import colormap from "./utils/colormap";
 import * as d3 from "d3";
 import './SnapShot.css'
 
+const RATIO = 0.6; // ratio of snapshot size to scatterplot size
+
 const SnapShot = (props) => {
   const { margin, width, height, pointSize, data, selectTime } = props;
   const { comments } = data;
+  const adjustedWidth = width * RATIO;
+  const adjustedHeight = height * RATIO;
+  const adjustedMargin = margin * RATIO;
   const [snapShots, setSnapShots] = useState([null, null]); // Two slots for snapshots
   const snapShotSvgRefs = useRef([createRef(), createRef()]);
+  const [compareIndexes, setCompareIndexes] = useState([]);
+  const [isCompareMode, setIsCompareMode] = useState(false);
 
   const addSnapShot = (index) => {
     if (snapShots[index] === null) {
@@ -41,11 +48,11 @@ const SnapShot = (props) => {
     const yExtent = d3.extent(snapshotData.map(d => parseFloat(d.y)));
     const sizeExtent = d3.extent(data.comments.map(d => parseInt(d.score)));
     
-    const xScale = d3.scaleLinear().domain(xExtent).range([0, ( width) / 2]);
-    const yScale = d3.scaleLinear().domain(yExtent).range([(height) / 2, 0]);
-    const sizeScale = d3.scaleLinear().domain(sizeExtent).range([3, 7]);
+    const xScale = d3.scaleLinear().domain(xExtent).range([0, adjustedWidth]);
+    const yScale = d3.scaleLinear().domain(yExtent).range([adjustedHeight, 0]);
+    const sizeScale = d3.scaleLinear().domain(sizeExtent).range([3.5 * RATIO, 7 * RATIO]);
 
-		const circleSvg = svg.append("g").attr("transform", `translate(${ margin/2 }, ${ margin/2 })`).attr("class", "snapShotCircleSvg")
+		const circleSvg = svg.append("g").attr("transform", `translate(${ adjustedMargin }, ${ adjustedMargin})`).attr("class", "snapShotCircleSvg")
 		const circles = circleSvg.selectAll("circle")
 						 .data(snapshotData)
 						 .enter()
@@ -59,6 +66,32 @@ const SnapShot = (props) => {
      
   }
 
+  const handleCompare = () => {
+    // Assuming you have two snapshots for comparison
+    
+
+    if (snapShots[0] && snapShots[1] && !isCompareMode) {
+
+      // Extract the comment indexes from each snapshot
+      const indexesFirstSnapshot = snapShots[0].map(comment => comment.id);
+      const indexesSecondSnapshot = snapShots[1].map(comment => comment.id);
+      console.log(indexesFirstSnapshot, indexesSecondSnapshot)
+      // Find the differences in comments
+      const differences = indexesSecondSnapshot.filter(id => !indexesFirstSnapshot.includes(id));
+
+      
+      // Update state or call an API with these differences
+      if (differences.length !== 0) {
+        console.log("differences: " + differences)
+        setCompareIndexes(differences);
+      }
+      // Here you would call your API with the differences
+      // ApiService.sendCompareData(differences).then(...) // Example API call
+    }
+    setIsCompareMode(!isCompareMode);
+    console.log(isCompareMode)
+  };
+
   useEffect(() => {
     snapShots.forEach((snapshot, index) => {
       if (snapshot) {
@@ -67,25 +100,34 @@ const SnapShot = (props) => {
     });
   }, [snapShots]);
 
-  const svgWidth = margin * 2 + width;
-  const svgHeight = margin * 2 + height;
+  const svgWidth = adjustedMargin * 2 + adjustedWidth;
+  const svgHeight = adjustedMargin * 2 + adjustedHeight;
 
   return (
-    <div className="snapshot-wrapper">
-      {snapShots.map((snapshot, index) => (
-        <div className="snapshot-slot" key={index} style={{ width: svgWidth / 2, height: svgHeight / 2 }}>
-          {snapshot ? (
-            <>
-              <svg ref={snapShotSvgRefs.current[index]} width={svgWidth / 2} height={svgHeight / 2} className="snapShotSvg"/>
-              <button onClick={() => removeSnapShot(index)} className="snapshot-remove-button">-</button>
-            </>
-          ) : (
-            <button onClick={() => addSnapShot(index)} className="snapshot-add-button">+</button>
-          )}
-        </div>
-      ))}
+    <div>
+      <div style={{display: 'flex', justifyContent: 'right', marginTop: '20px', marginBottom: '10px'}}>
+      {snapShots[0] && snapShots[1] ? (
+          <button onClick={handleCompare} className={`compare-button ${isCompareMode ? "active" : ""}`}>Compare</button>
+        ):
+          <button onClick={handleCompare} className="compare-button-invisible">Compare</button>}
+      </div>
+      <div className="snapshot-container">
+        {snapShots.map((snapshot, index) => (
+          <div className="snapshot-slot" key={index} style={{ width: svgWidth, height: svgHeight }}>
+            {snapshot ? (
+              <>
+                <svg ref={snapShotSvgRefs.current[index]} width={svgWidth} height={svgHeight} className="snapShotSvg" />
+                <button onClick={() => removeSnapShot(index)} className="snapshot-remove-button">-</button>
+              </>
+            ) : (
+              <button onClick={() => addSnapShot(index)} className="snapshot-add-button">+</button>
+            )}
+          </div>
+        ))}
+
+      </div>
     </div>
   );
-};
+}
 
 export default SnapShot;

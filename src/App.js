@@ -88,7 +88,7 @@ function App() {
   //     const filteredCom = allComData.comments.filter(d =>{
   //       const date = new Date(d.created_date.split(' ')[0]);
   //       return date >= startDate && date < endDate;
-  //     })
+  //     })isCompareMode
   //     console.log(filteredCom);
   //   }
 
